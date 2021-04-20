@@ -779,7 +779,7 @@ def p4Where(depotPath):
                 output = entry
                 break
         elif "data" in entry:
-            data = entry.get("data")
+            data = decode_text_stream(entry.get("data"))
             space = data.find(" ")
             if data[:space] == depotPathLong:
                 output = entry
