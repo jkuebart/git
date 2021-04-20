@@ -413,7 +413,7 @@ def p4_version_string():
     return _p4_version_string
 
 def p4_integrate(src, dest):
-    p4_system(["integrate", "-Dt", wildcard_encode(src), wildcard_encode(dest)])
+    p4_system(["integrate", "-d", wildcard_encode(src), wildcard_encode(dest)])
 
 def p4_sync(f, *options):
     p4_system(["sync"] + list(options) + [wildcard_encode(f)])
