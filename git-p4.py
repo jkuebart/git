@@ -3185,8 +3185,7 @@ class P4Sync(Command, P4UserMap):
         to_check = ['%s@%s' % (wildcard_encode(p), change) for p in to_check
             if self.hasBranchPrefix(p)]
         if to_check:
-            stat_result = p4CmdList(["-x", "-", "fstat", "-T",
-                "depotFile,headAction,headRev,headType"], stdin=to_check)
+            stat_result = p4CmdList(["-x", "-", "fstat"], stdin=to_check)
             for record in stat_result:
                 if record['code'] != 'stat':
                     continue
