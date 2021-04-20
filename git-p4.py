@@ -54,8 +54,6 @@ defaultLabelRegexp = r'[a-zA-Z0-9_\-.]+$'
 # The block size is reduced automatically if required
 defaultBlockSize = 1<<20
 
-p4_access_checked = False
-
 def p4_build_cmd(cmd):
     """Build a suitable p4 command line.
 
@@ -97,12 +95,6 @@ def p4_build_cmd(cmd):
         real_cmd = ' '.join(real_cmd) + ' ' + cmd
     else:
         real_cmd += cmd
-
-    # now check that we can actually talk to the server
-    global p4_access_checked
-    if not p4_access_checked:
-        p4_access_checked = True    # suppress access checks in p4_check_access itself
-        p4_check_access()
 
     return real_cmd
 
@@ -403,51 +395,6 @@ def p4_system(cmd):
 
 def die_bad_access(s):
     die("failure accessing depot: {0}".format(s.rstrip()))
-
-def p4_check_access(min_expiration=1):
-    """ Check if we can access Perforce - account still logged in
-    """
-    results = p4CmdList(["login", "-s"])
-
-    if len(results) == 0:
-        # should never get here: always get either some results, or a p4ExitCode
-        assert("could not parse response from perforce")
-
-    result = results[0]
-
-    if 'p4ExitCode' in result:
-        # p4 returned non-zero status, e.g. P4PORT invalid, or p4 not in path
-        die_bad_access("could not run p4")
-
-    code = result.get("code")
-    if not code:
-        # we get here if we couldn't connect and there was nothing to unmarshal
-        die_bad_access("could not connect")
-
-    elif code == "stat":
-        expiry = result.get("TicketExpiration")
-        if expiry:
-            expiry = int(expiry)
-            if expiry > min_expiration:
-                # ok to carry on
-                return
-            else:
-                die_bad_access("perforce ticket expires in {0} seconds".format(expiry))
-
-        else:
-            # account without a timeout - all ok
-            return
-
-    elif code == "error":
-        data = result.get("data")
-        if data:
-            die_bad_access("p4 error: {0}".format(data))
-        else:
-            die_bad_access("unknown error")
-    elif code == "info":
-        return
-    else:
-        die_bad_access("unknown error code {0}".format(code))
 
 _p4_version_string = None
 def p4_version_string():
@@ -4038,8 +3985,6 @@ class P4Sync(Command, P4UserMap):
                     ## FIXME
                     b = b[len(self.projectName):]
                 self.createdBranches.add(b)
-
-        p4_check_access()
 
         self.openStreams()
 
