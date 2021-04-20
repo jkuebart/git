@@ -781,7 +781,7 @@ def p4Where(depotPath):
         elif "data" in entry:
             data = entry.get("data")
             space = data.find(" ")
-            if data[:space] == depotPath:
+            if data[:space] == depotPathLong:
                 output = entry
                 break
     if output == None:
