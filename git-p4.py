@@ -1150,6 +1150,7 @@ def getClientSpec():
             die("Expected view key %s missing" % k)
         view.append(entry[k])
 
+    print("view={}".format(view))
     return view
 
 def getClientRoot():
@@ -2561,6 +2562,10 @@ class View(object):
         self.client_prefix = "//%s/" % client_name
         # cache results of "p4 where" to lookup client file locations
         self.client_spec_path_cache = {}
+
+    def __str__(self):
+        return "client_prefix={} mappings={}".format(self.client_prefix,
+                self.mappings)
 
     def append(self, view_line):
         """Parse a view line, splitting it into depot and client
@@ -4320,6 +4325,7 @@ commands = {
 }
 
 def main():
+    print(sys.argv)
     if len(sys.argv[1:]) == 0:
         printUsage(commands.keys())
         sys.exit(2)
