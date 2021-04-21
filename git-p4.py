@@ -2627,15 +2627,26 @@ class View(object):
             if "code" in res and res["code"] == "error":
                 # assume error is "... file(s) not in client view"
                 continue
-            if "clientFile" not in res:
+            if "clientFile" in res:
+                client_file = res["clientFile"]
+            elif "data" in res:
+                # Filenames with spaces complicate parsing.
+                data = re.match(r"(//.*) (//.*) [A-Za-z]:", res["data"].decode())
+                if not data:
+                    die("Cannot parse {}".format(res["data"]))
+                    continue
+                depot_path = decode_path(data[1])
+                client_file = data[2]
+            else:
                 die("No clientFile in 'p4 where' output")
             if "unmap" in res:
                 # it will list all of them, but only one not unmap-ped
                 continue
-            depot_path = decode_path(res['depotFile'])
+            if "depotFile" in res:
+                depot_path = decode_path(res['depotFile'])
             if gitConfigBool("core.ignorecase"):
                 depot_path = depot_path.lower()
-            self.client_spec_path_cache[depot_path] = self.convert_client_path(res["clientFile"])
+            self.client_spec_path_cache[depot_path] = self.convert_client_path(client_file)
 
         # not found files or unmap files set to ""
         for depotFile in fileArgs:
