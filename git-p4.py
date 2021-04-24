@@ -2979,6 +2979,11 @@ class P4Sync(Command, P4UserMap):
             print("\nIgnoring apple filetype file %s" % file['depotFile'])
             return
 
+        if type_base == "unicode":
+            # Emulate encoding "UTF8-BOM".
+            if contents and contents[0][0:3] != b"\xef\xbb\xbf":
+                contents[0:0] = [b"\xef\xbb\xbf"]
+
         # Note that we do not try to de-mangle keywords on utf16 files,
         # even though in theory somebody may want that.
         pattern = p4_keywords_regexp_for_type(type_base, type_mods)
