@@ -294,11 +294,13 @@ test_expect_success 'git p4 clone complex branches' '
 		test_path_is_file file3 &&
 		grep update file2 &&
 		git reset --hard p4/depot/branch4 &&
+		test "$(git rev-list --count p4/depot/branch2..HEAD)" = 0
 		test_path_is_file file1 &&
 		test_path_is_file file2 &&
 		test_path_is_missing file3 &&
 		! grep update file2 &&
 		git reset --hard p4/depot/branch5 &&
+		test "$(git rev-list --count p4/depot/branch3..HEAD)" = 0
 		test_path_is_file file1 &&
 		test_path_is_file file2 &&
 		test_path_is_file file3 &&
