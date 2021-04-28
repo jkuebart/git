@@ -392,7 +392,7 @@ test_expect_success 'B: accept branch name "TEMP_TAG"' '
 		git gc
 		git prune" &&
 	git fast-import <input &&
-	test -f .git/TEMP_TAG &&
+	git rev-parse TEMP_TAG &&
 	test $(git rev-parse main) = $(git rev-parse TEMP_TAG^)
 '
 

@@ -52,7 +52,7 @@ test_expect_success 'create_symref(FOO, refs/heads/main)' '
 	test_cmp expected actual
 '
 
-test_expect_success 'for_each_reflog()' '
+test_expect_success REFFILES 'for_each_reflog()' '
 	echo $ZERO_OID > .git/logs/PSEUDO-MAIN &&
 	mkdir -p     .git/logs/refs/bisect &&
 	echo $ZERO_OID > .git/logs/refs/bisect/random &&

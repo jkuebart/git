@@ -7,18 +7,13 @@ test_description='basic symbolic-ref tests'
 # the git repo, meaning that further tests will operate on
 # the surrounding git repo instead of the trash directory.
 reset_to_sane() {
-	echo ref: refs/heads/foo >.git/HEAD
+	git --git-dir .git symbolic-ref HEAD refs/heads/foo
 }
 
-test_expect_success 'symbolic-ref writes HEAD' '
-	git symbolic-ref HEAD refs/heads/foo &&
-	echo ref: refs/heads/foo >expect &&
-	test_cmp expect .git/HEAD
-'
-
-test_expect_success 'symbolic-ref reads HEAD' '
-	echo refs/heads/foo >expect &&
-	git symbolic-ref HEAD >actual &&
+test_expect_success 'symbolic-ref read/write roundtrip' '
+	git symbolic-ref HEAD refs/heads/read-write-roundtrip &&
+	echo refs/heads/read-write-roundtrip > expect &&
+	git symbolic-ref HEAD > actual &&
 	test_cmp expect actual
 '
 
@@ -42,16 +37,16 @@ reset_to_sane
 test_expect_success 'symbolic-ref can be deleted' '
 	git symbolic-ref NOTHEAD refs/heads/foo &&
 	git symbolic-ref -d NOTHEAD &&
-	test_path_is_file .git/refs/heads/foo &&
-	test_path_is_missing .git/NOTHEAD
+	git rev-parse refs/heads/foo &&
+	! git symbolic-ref NOTHEAD
 '
 reset_to_sane
 
 test_expect_success 'symbolic-ref can delete dangling symref' '
 	git symbolic-ref NOTHEAD refs/heads/missing &&
 	git symbolic-ref -d NOTHEAD &&
-	test_path_is_missing .git/refs/heads/missing &&
-	test_path_is_missing .git/NOTHEAD
+	! git rev-parse refs/heads/missing &&
+	! git symbolic-ref NOTHEAD
 '
 reset_to_sane
 
