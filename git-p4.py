@@ -2984,6 +2984,23 @@ class P4Sync(Command, P4UserMap):
             if contents and contents[0][0:3] != b"\xef\xbb\xbf":
                 contents[0:0] = [b"\xef\xbb\xbf"]
 
+        if False and type_base == "binary":
+            import codecs
+            encoding = None
+            if contents and contents[0][0:2] == b"\xfe\xff":
+                encoding = "utf-16be"
+            elif contents and contents[0][0:2] == b"\xff\xfe":
+                encoding = "utf-16le"
+
+            if encoding:
+                codec = codecs.getincrementaldecoder(encoding)()
+                contents = [
+                    codec.decode(c).encode("utf-8") for c in contents
+                ]
+                contents.append(codec.decode(b"", True).encode("utf-8"))
+                if 0 == len(contents[-1]):
+                    contents.pop()
+
         # Note that we do not try to de-mangle keywords on utf16 files,
         # even though in theory somebody may want that.
         pattern = p4_keywords_regexp_for_type(type_base, type_mods)
