@@ -2979,7 +2979,7 @@ class P4Sync(Command, P4UserMap):
             print("\nIgnoring apple filetype file %s" % file['depotFile'])
             return
 
-        if type_base == "unicode":
+        if type_base == "unicode" and os.environ.get("P4CHARSET", "")[-4:] == "-bom":
             # Emulate encoding "UTF8-BOM".
             if contents and contents[0][0:3] != b"\xef\xbb\xbf":
                 contents[0:0] = [b"\xef\xbb\xbf"]
